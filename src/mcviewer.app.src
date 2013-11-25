@@ -1,0 +1,13 @@
+%% -*- erlang -*-
+{application, mcviewer,
+ [
+  {description, "Memcheck Ubigraph viewer"},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, {mcviewer_app, []}},
+  {env, []}
+ ]}.
