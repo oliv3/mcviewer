@@ -21,8 +21,14 @@ start_link() ->
 %% ===================================================================
 %% Supervisor callbacks
 %% ===================================================================
+%% init([]) ->
+%%     Ubigraph = ?CHILD(mcviewer_ubigraph_server, worker),
+%%     Grapher = ?CHILD(mcviewer_graph, worker),
+%%     Erlubi = ?CHILD(erlubi, worker),
+%%     XML = ?CHILD(xml_stream, worker),
+%%     Leaks = ?CHILD(mcviewer_leaks, worker),
+%%     {ok, {{one_for_one, 5, 10}, [Ubigraph, Grapher, Erlubi, XML, Leaks]}}.
 
 init([]) ->
     Ubigraph = ?CHILD(mcviewer_ubigraph_server, worker),
-    Grapher = ?CHILD(mcviewer_graph, worker),
-    {ok, {{one_for_one, 5, 10}, [Ubigraph, Grapher]}}.
+    {ok, {{one_for_one, 5, 10}, [Ubigraph]}}.

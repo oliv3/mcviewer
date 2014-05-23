@@ -5,7 +5,7 @@ all:
 
 clean:
 	@rebar clean
-	@./clean-dump.sh
+	rm -f erl_crash.dump
 
 distclean:
 	@rm -f core* vgcore.*

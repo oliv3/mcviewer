@@ -124,14 +124,10 @@ valgrindoutput([#xmlElement{name = error, content = C} | Elems], Acc) ->
     %% io:format("~p~n", [Err]),
     valgrindoutput(Elems, [Err | Acc]);
 valgrindoutput([#xmlElement{name = errorcounts} | Elems], Acc) ->
-    %% C1 = trim_whites(C),
     cio:info("Skipping error counts~n", []),
-    %% Err = mc_error(C1),
     valgrindoutput(Elems, Acc);
 valgrindoutput([#xmlElement{name = suppcounts} | Elems], Acc) ->
-    %% C1 = trim_whites(C),
     cio:info("Skipping suppression counts~n", []),
-    %% Err = mc_error(C1),
     valgrindoutput(Elems, Acc);
 valgrindoutput([Elem | Elems], Acc) ->
     cio:warn("==> ~p~n", [Elem]),

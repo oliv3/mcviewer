@@ -1,0 +1,14 @@
+-define(VALGRIND_OUTPUT, <<"valgrindoutput">>).
+-define(VALGRIND_PROTOCOL_VERSION, <<"protocolversion">>).
+-define(VALGRIND_PROTOCOL_TOOL, <<"protocoltool">>).
+-define(VALGRIND_PREAMBLE, <<"preamble">>).
+-define(VALGRIND_PID, <<"pid">>).
+-define(VALGRIND_PPID, <<"ppid">>).
+-define(VALGRIND_TOOL, <<"tool">>).
+-define(VALGRIND_TOOL_MEMCHECK, <<"memcheck">>).
+-define(VALGRIND_ARGS,  <<"args">>).
+-define(VALGRIND_STATUS, <<"status">>).
+-define(VALGRIND_ERROR, <<"error">>).
+-define(VALGRIND_ERRORS_COUNT, <<"errorcounts">>).
+-define(VALGRIND_SUPPRESSIONS_COUNT, <<"suppcounts">>).
+-define(VALGRIND_USER_COMMENT, <<"usercomment">>).
