@@ -2,6 +2,7 @@ a.out
 deps/
 ebin/
 priv/
+.eunit/
 erl_crash.dump
 *~
 *.beam
