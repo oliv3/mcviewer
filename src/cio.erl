@@ -4,6 +4,7 @@
 
 -export([on/0, off/0, enable/1]).
 -export([debug/1]).
+-export([ok/1, warn/1, info/1, fail/1, dbg/1, conf/1]).
 -export([ok/2, warn/2, info/2, fail/2, dbg/2, conf/2]).
 -export([elapsed/1]).
 
@@ -67,6 +68,9 @@ get_clr() ->
     end.
 
 
+ok(Str) ->
+    ok(Str, []).
+
 ok(Fmt, Args) ->
     ok(Fmt, Args, get_clr()).
 ok(Fmt, Args, false) ->
@@ -74,6 +78,9 @@ ok(Fmt, Args, false) ->
 ok(Fmt, Args, true) ->
     io:format("[~s ok ~s] " ++ Fmt, [?BGREEN, ?NONE] ++ Args).
 
+
+warn(Str) ->
+    warn(Str, []).
 
 warn(Fmt, Args) ->
     warn(Fmt, Args, get_clr()).
@@ -83,6 +90,9 @@ warn(Fmt, Args, true) ->
     io:format("[~swarn~s] " ++ Fmt, [?BYELLOW, ?NONE] ++ Args).
 
 
+info(Str) ->
+    info(Str, []).
+
 info(Fmt, Args) ->
     info(Fmt, Args, get_clr()).
 info(Fmt, Args, false) ->
@@ -91,6 +101,9 @@ info(Fmt, Args, true) ->
     io:format("[~sinfo~s] " ++ Fmt, [?SEABLUE, ?NONE] ++ Args).
 
 
+fail(Str) ->
+    fail(Str, []).
+
 fail(Fmt, Args) ->
     fail(Fmt, Args, get_clr()).
 fail(Fmt, Args, false) ->
@@ -98,6 +111,9 @@ fail(Fmt, Args, false) ->
 fail(Fmt, Args, true) ->
     io:format("[~sFAIL~s] " ++ Fmt, [?BRED, ?NONE] ++ Args).
 
+
+dbg(Str) ->
+    dbg(Str, []).
 
 dbg(Fmt, Args) ->
     dbg(Fmt, Args, get_clr(), get(?DEBUG)).
@@ -113,6 +129,8 @@ dbg(Fmt, Args, Clr, Debug) ->
     fail("bad dbg: ~p ~p ~p ~p~n", [Fmt, Args, Clr, Debug]).
 
 
+conf(Str) ->
+    conf(Str, []).
 
 conf(Fmt, Args) ->
     conf(Fmt, Args, get_clr()).
