@@ -1,5 +1,7 @@
 // From https://people.gnome.org/~newren/tutorials/developing-with-gnome/html/apes02.html
 
+// Modified for mcviewer
+
 /*
  * This program has various memory related problems that provide a good way
  * to show off the various abilities of valgrind.  To run it:
@@ -130,7 +132,7 @@ main(int argc, char**argv)
 {
   if (argc!=2) {
     cerr << "Syntax:" << endl;
-    cerr << "  " << argv[0] << " <test-number>" << endl;
+    cerr << "  " << argv[0] << " [test-number]" << endl;
     return -1;
   }
   int test_number = atoi(argv[1]);
