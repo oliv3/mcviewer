@@ -4,8 +4,7 @@
 
 -export([main/1]).
 
--export([recv/0]).
--export([test/0]).
+%% -export([recv/0]).
 
 %% Internal export
 -export([stdio/2]).
@@ -203,6 +202,9 @@ main(["run" | Args]) ->
 main(["server"]) ->
     application:start(mcviewer),
     timer:sleep(infinity);
+main(["test"]) ->
+    test(),
+    halt(0);
 main([]) ->
     usage(escript:script_name()),
     halt(1);
