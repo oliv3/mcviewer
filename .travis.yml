@@ -1,4 +1,7 @@
 language: erlang
 script: "make"
 otp_release:
-  - R17
+  - R17.3
+  - R17.2
+  - R17.1
+  - R17.0
