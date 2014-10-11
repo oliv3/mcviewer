@@ -1,2 +1,4 @@
 language: erlang
 script: "make"
+otp_release:
+  - R17
