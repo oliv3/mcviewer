@@ -214,7 +214,7 @@ main(Args) ->
 usage(ProgName) ->
     io:format("usage: ~s [command] [arguments]~n", [ProgName]),
     io:format("~n\tcommands:~n"),
-    io:format("\t\trun <command>: Run the specified command through valgrind~n").
+    io:format("\t\trun [command]: Run the specified command through valgrind~n").
 
 
 test() ->
