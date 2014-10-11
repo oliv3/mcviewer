@@ -1,5 +1,9 @@
 language: erlang
 script: "make"
+notifications:
+  irc: "irc.freenode.org#banane"
+  recipients:
+    - olivier@biniou.info
 otp_release:
   - 17.3
   - 17.1
