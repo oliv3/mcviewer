@@ -115,6 +115,7 @@ main(["stream" | File]) ->
     halt(0);
 main(["run" | Args]) ->
     cio:on(),
+    %% cio:debug(true),
 
     %% application:start(mcviewer),
     application:start(exec),

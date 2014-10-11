@@ -70,6 +70,7 @@ start_link(Parent, Command) ->
 init([Parent, Command]) ->
     cio:on(),
     %% cio:debug(true),
+
     %% Populate atoms table
     %% Listed in the order they appear in memcheck/mc_errors.c
     cio:dbg("Atom: ~p~n", ['CoreMemError']),
@@ -84,6 +85,7 @@ init([Parent, Command]) ->
     cio:dbg("Atom: ~p~n", ['InvalidJump']),
     cio:dbg("Atom: ~p~n", ['Overlap']),
     cio:dbg("Atom: ~p~n", ['InvalidMemPool']),
+
     {ok, waiting, #state{parent = Parent, command = Command}}.
 
 %%--------------------------------------------------------------------
@@ -274,8 +276,14 @@ exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_ERRORS_COUNT,
 exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_SUPPRESSIONS_COUNT,
 				  children = C0}}, State) ->
     C1 = remove_whitespaces(C0),
-    cio:dbg("exiting/2: Houston we (also) got SUPPRESSIONS: ~p~n", [C1]),
-    cio:info("exiting/2: Houston we (also) got SUPPRESSIONS...~n", []),
+    case C1 of
+	[] ->
+	    ok;
+
+	C1 ->
+	    cio:dbg("exiting/2: got SUPPRESSIONS: ~p~n", [C1]),
+	    cio:info("exiting/2: got SUPPRESSIONS...~n", [])
+    end,
     {next_state, exiting, State};
 exiting({xmlstreamend, ?VALGRIND_OUTPUT}, #state{parent = P, errors = Errors} = State) ->
     cio:ok("All done, FSM exiting~n", []),
