@@ -11,6 +11,10 @@
  *   --logfile=valgrind.output --num-callers=6 --leak-check=yes
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include <cassert>
 #include <iostream>
 
