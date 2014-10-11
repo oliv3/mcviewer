@@ -193,10 +193,19 @@ main(["run" | Args]) ->
 main(["server"]) ->
     application:start(mcviewer),
     timer:sleep(infinity);
+main([]) ->
+    usage(escript:script_name()),
+    halt(1);
 main(Args) ->
     cio:on(),
     cio:ok("Args: ~p~n", [Args]),
     halt(0).
+
+
+usage(ProgName) ->
+    io:format("usage: ~s [command] [arguments]~n", [ProgName]),
+    io:format("~n\tcommands:~n"),
+    io:format("\t\trun <command>: Run the specified command through valgrind~n").
 
 
 test() ->
