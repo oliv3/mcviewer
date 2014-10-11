@@ -120,10 +120,19 @@ main(["run" | Args]) ->
     application:start(exec),
     %% exec:start([debug, verbose]),
 
+    cio:info("Started applications~n", []),
+
     erlubi:start_link(),
+    cio:info("Started erlubi~n", []),
+
     mcviewer_graph:start_link(),
+    cio:info("Started mcviewer_graph~n", []),
+
     xml_stream:start_link(),
+    cio:info("Started xml_stream~n", []),
+
     mcviewer_leaks:start_link(),
+    cio:info("Started mcviewer_leaks~n", []),
 
     %% wait(),
     cio:dbg("Args: ~p~n", [Args]),
