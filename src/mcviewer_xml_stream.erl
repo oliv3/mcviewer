@@ -259,8 +259,14 @@ exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_ERROR, children = C0}}, #stat
 exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_ERRORS_COUNT,
 				  children = C0}}, State) ->
     C1 = remove_whitespaces(C0),
-    cio:dbg("exiting/2: Houston we got ERRORS: ~p~n", [C1]),
-    cio:fail("exiting/2: Houston we got ERRORS...~n", []),
+    case C1 of
+	[] ->
+	    ok;
+
+	C1 ->
+	    cio:dbg("exiting/2: Houston we got ERRORS: ~p~n", [C1]),
+	    cio:fail("exiting/2: Houston we got ERRORS...~n", [])
+    end,
     {next_state, exiting, State};
 %% {xmlstreamelement,
 %%                              {xmlel,<<"suppcounts">>,[],
