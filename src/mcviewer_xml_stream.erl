@@ -236,7 +236,7 @@ running(_Event, State) ->
 
 exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_ERROR, children = C0}}, #state{errors = Errors, error_cb = CB} = State) ->
     C1 = remove_whitespaces(C0),
-    cio:dbg("exiting/2: error(~n~p~n)~n", [C1]),
+    cio:dbg("exiting/2: CB= ~p error(~n~p~n)~n", [CB, C1]),
     #mc_error{kind = _Kind} = Error = ?MODULE:CB(C1),
     %% cio:ok("Error: ~p~n", [Error]),
     cio:warn("#memcheck Leak ERROR (~w)~n", [_Kind]),
@@ -452,7 +452,6 @@ remove_whitespaces(List) ->
 		 end, List).
 
 
-%% NEW Code
 mc_error([#xmlel{name = <<"unique">>,
 		 children = [{xmlcdata, UniqueBin}]}, %% <<"0x2">>
 	  #xmlel{name = <<"tid">>,
@@ -510,6 +509,28 @@ mc_error([#xmlel{name = <<"unique">>,
 		      what = WhatBin,
 		      stack = Stack},
     update_error(Error, Rest);
+mc_error([#xmlel{name = <<"unique">>,
+		 children = [{xmlcdata, UniqueBin}]},
+	  #xmlel{name = <<"tid">>,
+		 children = [{xmlcdata, TidBin}]},
+	  #xmlel{name = <<"kind">>,
+		 children = [{xmlcdata, KindBin}]},
+	  #xmlel{name = <<"xwhat">>,
+		 children = XWhat0},
+	  #xmlel{name = <<"stack">>,
+		 children = Stack0}
+	  | Rest]) ->
+    Kind = binary_to_atom(KindBin),
+    XWhat = xwhat(remove_whitespaces(XWhat0)),
+    Stack = stack(remove_whitespaces(Stack0)),
+    mcviewer_leaks:add_leak(Kind, XWhat#leak.bytes, XWhat#leak.blocks),
+    Error = #mc_error{unique = UniqueBin,
+		      tid = binary_to_integer(TidBin),
+		      kind = binary_to_existing_atom(KindBin),
+		      xwhat = XWhat,
+		      auxstack = Stack},
+    %% update_error_aux(Error, Rest); %% Or use existing update_error/2 ?
+    Error;
 mc_error(Other) ->
     cio:warn("Unimplemented error: ~p~n", [Other]),
     undefined.

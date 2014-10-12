@@ -164,7 +164,8 @@ errors_cb([], LastErrorV) ->
     LastErrorV;
 errors_cb([#mc_error{kind = 'Leak_PossiblyLost'} | Errors], LastErrorV) ->
     errors_cb(Errors, LastErrorV);
-errors_cb([#mc_error{unique = Unique, tid = Tid, kind = Kind, what = What, stack = []} | Errors], LastErrorV) ->
+errors_cb([#mc_error{unique = Unique, tid = Tid, kind = Kind, what = What, stack = Stack, auxstack = AuxStack} | Errors], LastErrorV)
+  when Stack =:= undefined andalso AuxStack =:= undefined ->
     cio:warn("No stack found for error ~p~n", [Unique]),
     errors_cb(Errors, LastErrorV);
 errors_cb([#mc_error{unique = Unique, tid = Tid, kind = Kind, what = What, stack = [#mc_frame{ip = IP} = At| By]} | Errors], LastErrorV) ->
@@ -213,7 +214,7 @@ errors_cb([#mc_error{unique = Unique, tid = Tid, kind = Kind, what = What, stack
 
     errors_cb(Errors, ErrorV);
 errors_cb([_Other | Errors], LastErrorV) ->
-    cio:warn("~s: unhandled: ~p~n", [?MODULE, _Other]),
+    cio:dbg("~s: unhandled: ~p~n", [?MODULE, _Other]),
     errors_cb(Errors, LastErrorV).
 
 
