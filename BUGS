@@ -1,2 +1,0 @@
-* c_src/valgrind-tests.cc:
-	case 4 doesn't generate any memcheck warning

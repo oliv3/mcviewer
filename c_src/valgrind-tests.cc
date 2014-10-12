@@ -65,8 +65,8 @@ test_4()
   // to ptr or valgrind won't catch the problem)
   int i;
   int * ptr = &i;
-  ptr[-8] = 7;                     // Error, writing to a bad location on stack
-  i = ptr[-15];                    // Error, reading from a bad stack location
+  ptr[-82] = 7;                     // Error, writing to a bad location on stack
+  i = ptr[-152];                    // Error, reading from a bad stack location
 }
 
 void
