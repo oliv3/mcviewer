@@ -160,7 +160,7 @@ main(["run" | Args]) ->
 
     receive
 	{finished, Pid, _Errors} ->
-	    cio:ok("All:~n~s~n~p~n~s~n", [sep(), mcviewer_leaks:info(), sep()]),
+	    %% cio:ok("All:~n~s~n~p~n~s~n", [sep(), mcviewer_leaks:info(), sep()]),
 	    cio:ok("Leaks: ~p~n", [mcviewer_leaks:info(count)]),
 	    cio:ok("Blocks: ~p~n", [mcviewer_leaks:info(blocks)]),
 	    cio:ok("Definitely lost: ~p~n", [mcviewer_leaks:info(definitely_lost)]),

@@ -69,7 +69,7 @@ start_link(Parent, Command) ->
 %%--------------------------------------------------------------------
 init([Parent, Command]) ->
     cio:on(),
-    cio:debug(true),
+    %% cio:debug(true),
 
     %% Populate atoms table
     %% Listed in the order they appear in memcheck/mc_errors.c
@@ -264,8 +264,7 @@ exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_ERRORS_COUNT,
 	    ok;
 
 	C1 ->
-	    cio:dbg("exiting/2: Houston we got ERRORS: ~p~n", [C1]),
-	    cio:fail("exiting/2: Houston we got ERRORS...~n", [])
+	    cio:dbg("exiting/2: got ERRORS: ~p~n", [C1])
     end,
     {next_state, exiting, State};
 %% {xmlstreamelement,
@@ -287,8 +286,7 @@ exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_SUPPRESSIONS_COUNT,
 	    ok;
 
 	C1 ->
-	    cio:dbg("exiting/2: got SUPPRESSIONS: ~p~n", [C1]),
-	    cio:info("exiting/2: got SUPPRESSIONS...~n", [])
+	    cio:dbg("exiting/2: got SUPPRESSIONS: ~p~n", [C1])
     end,
     {next_state, exiting, State};
 exiting({xmlstreamend, ?VALGRIND_OUTPUT}, #state{parent = P, errors = Errors} = State) ->
@@ -505,16 +503,27 @@ mc_error([#xmlel{name = <<"unique">>,
 	  #xmlel{name = <<"stack">>,
 		 children = Stack0}
 	  | Rest]) ->
-    cio:dbg("NEW parser: Rest= ~p~n", [Rest]),
     Stack = stack(remove_whitespaces(Stack0)),
-    #mc_error{unique = UniqueBin,
-	      tid = binary_to_integer(TidBin),
-	      kind = binary_to_existing_atom(KindBin),
-	      what = WhatBin,
-	      stack = Stack};
+    Error = #mc_error{unique = UniqueBin,
+		      tid = binary_to_integer(TidBin),
+		      kind = binary_to_existing_atom(KindBin),
+		      what = WhatBin,
+		      stack = Stack},
+    update_error(Error, Rest);
 mc_error(Other) ->
     cio:warn("Unimplemented error: ~p~n", [Other]),
     undefined.
+
+
+update_error(#mc_error{auxwhat = undefined} = Error, [#xmlel{name = <<"auxwhat">>,
+							     children = [{xmlcdata, AuxWhatBin0}]},
+						      #xmlel{name = <<"auxwhat">>,
+							     children = [{xmlcdata, AuxWhatBin1}]}]) ->
+    AuxWhat = iolist_to_binary([AuxWhatBin0, <<", ">>, AuxWhatBin1]),
+    Error#mc_error{auxwhat = AuxWhat};
+update_error(Error, Rest) ->
+    cio:dbg("NEW parser: Rest= ~p~n", [Rest]),
+    Error.
 
 
 stack(Frames) ->
