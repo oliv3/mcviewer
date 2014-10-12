@@ -45,8 +45,9 @@ valgrind(Command) ->
     %% ++ " --xml-socket=127.0.0.1:6666"
 	++ " --tool=memcheck"
 	++ " --leak-check=full"
-	++ " --xml-user-comment=\"Powered by mcviewer v" ++ atom_to_list(?VSN) ++ "\""
-    %% ++ " --trace-children=yes"
+	++ " --xml-user-comment=\"mcviewer v" ++ atom_to_list(?VSN) ++ "\""
+	++ " --trace-children=yes"
+	++ " --track-origins=yes"
 	++ " " ++ Command.
 
 
