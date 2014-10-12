@@ -147,7 +147,6 @@ main(int argc, char**argv)
 	test_6();
 	test_7();
 	test_8();
-	test_9();
 	break;
     case 1: test_1(); break;
     case 2: test_2(); break;
