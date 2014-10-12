@@ -69,7 +69,7 @@ start_link(Parent, Command) ->
 %%--------------------------------------------------------------------
 init([Parent, Command]) ->
     cio:on(),
-    %% cio:debug(true),
+    cio:debug(true),
 
     %% Populate atoms table
     %% Listed in the order they appear in memcheck/mc_errors.c
@@ -454,6 +454,7 @@ remove_whitespaces(List) ->
 		 end, List).
 
 
+%% NEW Code
 mc_error([#xmlel{name = <<"unique">>,
 		 children = [{xmlcdata, UniqueBin}]}, %% <<"0x2">>
 	  #xmlel{name = <<"tid">>,
@@ -479,19 +480,18 @@ mc_error([#xmlel{name = <<"unique">>,
 	  #xmlel{name = <<"what">>,
 		 children = [{xmlcdata, WhatBin}]}, %% <<"Use of uninitialised value of size 8">>
 	  #xmlel{name = <<"stack">>,
-		 children = WhatStack0},
+		 children = Stack0},
 	  #xmlel{name = <<"auxwhat">>,
 		 children = [{xmlcdata, AuxWhatBin}]}, %% <<"Use of uninitialised value of size 8">>
 	  #xmlel{name = <<"stack">>,
-		 children = AuxWhatStack0}
-	 ]) ->
-    WhatStack = stack(remove_whitespaces(WhatStack0)),
+		 children = AuxWhatStack0}]) ->
+    Stack = stack(remove_whitespaces(Stack0)),
     AuxWhatStack = stack(remove_whitespaces(AuxWhatStack0)),
     #mc_error{unique = UniqueBin,
 	      tid = binary_to_integer(TidBin),
 	      kind = binary_to_existing_atom(KindBin),
 	      what = WhatBin,
-	      stack = WhatStack,
+	      stack = Stack,
 	      auxwhat = AuxWhatBin,
 	      auxstack = AuxWhatStack};
 mc_error([#xmlel{name = <<"unique">>,
@@ -503,50 +503,14 @@ mc_error([#xmlel{name = <<"unique">>,
 	  #xmlel{name = <<"what">>,
 		 children = [{xmlcdata, WhatBin}]}, %% <<"Use of uninitialised value of size 8">>
 	  #xmlel{name = <<"stack">>,
-		 children = WhatStack0},
-	  #xmlel{name = <<"auxwhat">>,
-		 children = [{xmlcdata, AuxWhatBin}]}
-	 ]) ->
-    WhatStack = stack(remove_whitespaces(WhatStack0)),
+		 children = Stack0}
+	  | Rest]) ->
+    cio:dbg("NEW parser: Rest= ~p~n", [Rest]),
+    Stack = stack(remove_whitespaces(Stack0)),
     #mc_error{unique = UniqueBin,
 	      tid = binary_to_integer(TidBin),
 	      kind = binary_to_existing_atom(KindBin),
 	      what = WhatBin,
-	      stack = WhatStack,
-	      auxwhat = AuxWhatBin};
-mc_error([#xmlel{name = <<"unique">>,
-		 children = [{xmlcdata, UniqueBin}]}, %% <<"0x2">>
-	  #xmlel{name = <<"tid">>,
-		 children = [{xmlcdata, TidBin}]}, %% <<"1">>
-	  #xmlel{name = <<"kind">>,
-		 children = [{xmlcdata, KindBin}]}, %% <<"Leak_PossiblyLost">>
-	  #xmlel{name = <<"xwhat">>,
-		 children = XWhat0}, %% see below
-	  #xmlel{name = <<"stack">>,
-		 children = Stack0}]) ->
-    %% xwhat secion
-    %% [{xmlcdata,<<"\n    ">>},
-    %%                                           {xmlel,<<"text">>,[],
-    %%                                            [{xmlcdata,
-    %%                                              <<"3 bytes in 1 blocks are possibly lost in loss record 5 of 439">>}]},
-    %%                                           {xmlcdata,<<"\n    ">>},
-    %%                                           {xmlel,<<"leakedbytes">>,[],
-    %%                                            [{xmlcdata,<<"3">>}]},
-    %%                                           {xmlcdata,<<"\n    ">>},
-    %%                                           {xmlel,<<"leakedblocks">>,[],
-    %%                                            [{xmlcdata,<<"1">>}]},
-    %%                                           {xmlcdata,<<"\n  ">>}]},
-    Kind = binary_to_atom(KindBin),
-    XWhat = xwhat(remove_whitespaces(XWhat0)),
-    Stack = stack(remove_whitespaces(Stack0)),
-    %% TODO skip text
-    %% BUT parse leakedbytes & leakedblocks to update statistics
-
-    mcviewer_leaks:add_leak(Kind, XWhat#leak.bytes, XWhat#leak.blocks),
-    #mc_error{unique = UniqueBin,
-	      tid = binary_to_integer(TidBin),
-	      kind = Kind,
-	      xwhat = XWhat,
 	      stack = Stack};
 mc_error(Other) ->
     cio:warn("Unimplemented error: ~p~n", [Other]),

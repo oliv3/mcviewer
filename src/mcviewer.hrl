@@ -1,4 +1,4 @@
--record(mc_error, {unique, tid, kind, what, xwhat, stack, auxwhat, auxstack}).
+-record(mc_error, {unique, tid, kind, what, xwhat, stack=[], auxwhat, auxstack=[]}).
 -record(mc_frame, {ip, obj, fn, dir, file, line}).
 -record(mc_leak,  {text, leakedbytes, leakedblocks}).
 
