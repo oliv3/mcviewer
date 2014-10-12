@@ -1,0 +1,16 @@
+Key(s)	Function
+============================================
+ESC	Exit full-screen mode
+↑ and ↓	Zoom in/out
+!	Zoom way out
+@	Zoom way in
+← and →	Start/increase/stop y-axis rotation
+u, d	Start/increase/stop z-axis rotation
+r	Reset vertices to random positions
++,-	Increase/decrease time step
+h	Toggle Runge-Kutta/Euler step
+p	Toggle serial/parallel
+f,F	Decrease/increase friction
+v	Toggle draw vertices
+s	Toggle draw strain
+S	Show performance stats
