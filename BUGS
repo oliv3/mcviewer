@@ -1,5 +1,1 @@
-* Programs waiting for some user input are not supported for now
-
-* (known valgrind bug as of 3.10): Using trace-children=yes may result
-in extra </valgrindoutput> tags to be emitted, that will break the XML
-parser
+* Programs reading from stdin are not supported for now
