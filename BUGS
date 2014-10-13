@@ -1,7 +1,5 @@
-* Programs waiting for some user input are not supported
+* Programs waiting for some user input are not supported for now
 
-* Possible valgrind bug: when the program forks and though
---trace-children is specified, valgrind will emit 2 </valgrindoutput>
-The first one causes the parser to stop, thus missing further informations
-
-
+* (known valgrind bug as of 3.10): Using trace-children=yes may result
+in extra </valgrindoutput> tags to be emitted, that will break the XML
+parser
