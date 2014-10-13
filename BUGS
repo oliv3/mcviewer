@@ -1,2 +1,7 @@
 * Programs waiting for some user input are not supported
 
+* Possible valgrind bug: when the program forks and though
+--trace-children is specified, valgrind will emit 2 </valgrindoutput>
+The first one causes the parser to stop, thus missing further informations
+
+
