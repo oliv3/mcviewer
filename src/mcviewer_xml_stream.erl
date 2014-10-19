@@ -141,7 +141,7 @@ valgrindoutput({xmlstreamelement, #xmlel{name = ?VALGRIND_PREAMBLE, children = C
     {next_state, valgrindoutput, State};
 valgrindoutput({xmlstreamelement, #xmlel{name = ?VALGRIND_PID, children = [{xmlcdata, BinPid}]}}, State) ->
     Pid = binary_to_integer(BinPid),
-    cio:dbg("Pid: ~w~n", [Pid]),
+    cio:dbg("Pid:  ~w~n", [Pid]),
     {next_state, valgrindoutput, State#state{pid = Pid}};
 valgrindoutput({xmlstreamelement, #xmlel{name = ?VALGRIND_PPID, children = [{xmlcdata, BinPPid}]}}, State) ->
     PPid = binary_to_integer(BinPPid),
@@ -171,7 +171,8 @@ starting({xmlstreamelement, #xmlel{name = ?VALGRIND_STATUS,
                                 %% {xmlcdata,<<"\n">>}]}
 				  }} = _Event, State) ->
     C1 = remove_whitespaces(C0),
-    cio:dbg("TBD: parse status ~p~n", [C1]),
+    parse_status(C1),
+    %% cio:dbg("TBD: parse status ~p~n", [C1]),
     cio:info("Got status, assuming we're ok...~n", []),
     {next_state, running, State};
 starting({xmlstreamelement, #xmlel{name = ?VALGRIND_USER_COMMENT, children = [{xmlcdata, UserComment}]}}, State) ->
@@ -208,7 +209,8 @@ running({xmlstreamelement, #xmlel{name = ?VALGRIND_STATUS,
 				  %% {xmlcdata,<<"\n">>}]}
 				 }} = _Event, State) ->
     C1 = remove_whitespaces(C0),
-    cio:dbg("TBD: parse status ~p~n", [C1]),
+    parse_status(C1),
+    %% cio:dbg("TBD: parse status ~p~n", [C1]),
     cio:info("Got status, assuming we're [EXITING] ok...~n", []),
     {next_state, exiting, State};
 running(_Event, State) ->
@@ -628,3 +630,8 @@ parse_cmdline(Label, [#xmlel{name = <<"exe">>, children = [{xmlcdata, Exe}]} | A
 
 fmt_arg(#xmlel{name = <<"arg">>, children = [{xmlcdata, Arg}]}) ->
     io:format("                   ~s~n", [Arg]).
+
+
+parse_status([#xmlel{name = <<"state">>, children = [{xmlcdata, State}]},
+	      #xmlel{name = <<"time">>, children = [{xmlcdata, Time}]}]) ->
+    cio:info("State: ~s, time: ~s~n", [State, Time]).
