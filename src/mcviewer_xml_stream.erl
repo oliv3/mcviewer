@@ -69,7 +69,7 @@ start_link(Parent, Command) ->
 %%--------------------------------------------------------------------
 init([Parent, Command]) ->
     cio:on(),
-    %% cio:debug(true),
+    cio:debug(true),
 
     %% Populate atoms table
     %% Listed in the order they appear in memcheck/mc_errors.c
@@ -157,26 +157,8 @@ valgrindoutput(_Event, State) ->
 starting({xmlstreamelement, #xmlel{name = ?VALGRIND_ARGS, children = C0}}, State) ->
     %% cio:warn("starting/2(~p)~n", [_Event]),
     C1 = remove_whitespaces(C0),
-    cio:dbg("TBD: valgrind args ~p~n", [C1]),
-%% [{xmlcdata,<<"\n  ">>},
-%% 				    {xmlel,<<"vargv">>,[],
-%% 				     [{xmlcdata,<<"\n    ">>},
-%% 				      {xmlel,<<"exe">>,[],
-%% 				       [{xmlcdata,<<"/usr/bin/valgrind.bin">>}]},
-%% 				      {xmlcdata,<<"\n    ">>},
-%% 				      {xmlel,<<"arg">>,[],
-%% 				       [{xmlcdata,<<"--xml=yes">>}]},
-%% 				      {xmlcdata,<<"\n    ">>},
-%% 				      {xmlel,<<"arg">>,[],
-%% 				       [{xmlcdata,<<"--xml-fd=2">>}]},
-%% 				      {xmlcdata,<<"\n  ">>}]},
-%% 				    {xmlcdata,<<"\n  ">>},
-%% 				    {xmlel,<<"argv">>,[],
-%% 				     [{xmlcdata,<<"\n    ">>},
-%% 				      {xmlel,<<"exe">>,[],
-%% 				       [{xmlcdata,<<"./src/lebiniou">>}]},
-%% 				      {xmlcdata,<<"\n  ">>}]},
-%% 				    {xmlcdata,<<"\n">>}]}}
+    %% cio:dbg("TBD: valgrind args ~p~n", [C1]),
+    parse_args(C1),
     {next_state, starting, State};
 starting({xmlstreamelement, #xmlel{name = ?VALGRIND_STATUS,
 				   children = C0
@@ -355,7 +337,7 @@ handle_event({xmlstreamcdata, <<"\n">> = _Event}, StateName, State) ->
     {next_state, StateName, State};
 
 handle_event({xmlstreamcdata, StdErr}, running, State) ->
-    cio:fail("~s: got client stderr: ~p~n", [?MODULE, StdErr]),
+    cio:warn("~s: got client stderr: ~p~n", [?MODULE, StdErr]),
     {next_state, running, State};
 
 handle_event(_Event, StateName, State) ->
@@ -627,3 +609,22 @@ dump_state(#state{tool = Tool, pid = Pid, ppid = PPid, errors = Errors}) ->
 	    cio:ok("No errors found~n", [])
     end,
     ok.
+
+
+parse_args([#xmlel{name = <<"vargv">>, children = VArgv0},
+	    #xmlel{name = <<"argv">>, children = Argv0}]) ->
+    VArgv = remove_whitespaces(VArgv0),
+    Argv = remove_whitespaces(Argv0),
+    %% cio:dbg("VArgv: ~p~n", [VArgv]),
+    %% cio:dbg("Argv;  ~p~n", [Argv]),
+    parse_cmdline("Valgrind:", VArgv),
+    parse_cmdline("Program: ", Argv).
+
+
+parse_cmdline(Label, [#xmlel{name = <<"exe">>, children = [{xmlcdata, Exe}]} | Args]) ->
+    cio:info("~s ~s~n", [Label, Exe]),
+    [fmt_arg(A) || A <- Args].
+
+
+fmt_arg(#xmlel{name = <<"arg">>, children = [{xmlcdata, Arg}]}) ->
+    io:format("                   ~s~n", [Arg]).
