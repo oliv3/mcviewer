@@ -1,1 +1,1 @@
-* Malformed XML input will break the parser.
+* Well-formed XML is supposed to be fed to the parser.
