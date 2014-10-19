@@ -174,6 +174,7 @@ main(["run" | Args]) ->
 	%%     cio:warn("OMG Other(1)= ~p~n", [Other1])
     end,
 
+    cio:info("Stopping OS wrapper...~n"),
     exec:stop(OsPid),
 
     receive
@@ -193,6 +194,9 @@ main(["run" | Args]) ->
 
 	Other2 ->
 	    cio:warn("OMG Other= ~p~n", [Other2])
+
+    after 10000 ->
+	    cio:fail("Failed to stop wrapper after 10 seconds~n")
     end,
 
     %% recv(),
