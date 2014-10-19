@@ -1,1 +1,1 @@
-* XML parsing bugs are what you'd expect to happen.
+* Malformed XML input will break the parser.
