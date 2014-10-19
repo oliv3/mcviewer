@@ -270,7 +270,8 @@ exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_SUPPRESSIONS_COUNT,
 	    ok;
 
 	C1 ->
-	    cio:dbg("exiting/2: got SUPPRESSIONS: ~p~n", [C1])
+	    cio:info("Suppressions:~n"),
+	    parse_suppressions(C1)
     end,
     {next_state, exiting, State};
 exiting({xmlstreamend, ?VALGRIND_OUTPUT}, #state{parent = P, errors = Errors} = State) ->
@@ -339,7 +340,7 @@ handle_event({xmlstreamcdata, <<"\n">> = _Event}, StateName, State) ->
     {next_state, StateName, State};
 
 handle_event({xmlstreamcdata, StdErr}, running, State) ->
-    cio:warn("~s: got client stderr: ~p~n", [?MODULE, StdErr]),
+    cio:warn("(stderr) ~s~n", [StdErr]),
     {next_state, running, State};
 
 handle_event(_Event, StateName, State) ->
@@ -635,3 +636,27 @@ fmt_arg(#xmlel{name = <<"arg">>, children = [{xmlcdata, Arg}]}) ->
 parse_status([#xmlel{name = <<"state">>, children = [{xmlcdata, State}]},
 	      #xmlel{name = <<"time">>, children = [{xmlcdata, Time}]}]) ->
     cio:info("State: ~s, time: ~s~n", [State, Time]).
+
+
+parse_suppressions([]) ->
+    ok;
+%% [{xmlel,<<"pair">>,[],
+%%                                                  [{xmlcdata,<<"\n    ">>},
+%%                                                   {xmlel,<<"count">>,[],
+%%                                                    [{xmlcdata,<<"168">>}]},
+%%                                                   {xmlcdata,<<"\n    ">>},
+%%                                                   {xmlel,<<"name">>,[],
+%%                                                    [{xmlcdata,
+%%                                                      <<"X on SUSE11 writev uninit padding">>}]},
+%%                                                   {xmlcdata,<<"\n  ">>}]}]
+parse_suppressions([#xmlel{name = <<"pair">>,
+			   children = C0} | Tail]) ->
+    C1 = remove_whitespaces(C0),
+    parse_suppression(C1),
+    %% cio:dbg("C1: ~p~n", [C1]),
+    parse_suppressions(Tail).
+
+
+parse_suppression([#xmlel{name = <<"count">>, children = [{xmlcdata, Count}]},
+		   #xmlel{name = <<"name">>, children = [{xmlcdata, Name}]}]) ->
+    io:format("         ~s (~s)~n", [Name, Count]).
