@@ -248,20 +248,10 @@ exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_ERRORS_COUNT,
 	    ok;
 
 	C1 ->
-	    cio:dbg("exiting/2: got ERRORS: ~p~n", [C1])
+	    cio:warn("Errors:~n"),
+	    parse_errors(lists:reverse(C1))
     end,
     {next_state, exiting, State};
-%% {xmlstreamelement,
-%%                              {xmlel,<<"suppcounts">>,[],
-%%                               [{xmlcdata,<<"\n  ">>},
-%%                                {xmlel,<<"pair">>,[],
-%%                                 [{xmlcdata,<<"\n    ">>},
-%%                                  {xmlel,<<"count">>,[],[{xmlcdata,<<"2">>}]},
-%%                                  {xmlcdata,<<"\n    ">>},
-%%                                  {xmlel,<<"name">>,[],
-%%                                   [{xmlcdata,<<"dl-hack3-cond-1">>}]},
-%%                                  {xmlcdata,<<"\n  ">>}]},
-%%                                {xmlcdata,<<"\n">>}]}}
 exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_SUPPRESSIONS_COUNT,
 				  children = C0}}, State) ->
     C1 = remove_whitespaces(C0),
@@ -660,3 +650,50 @@ parse_suppressions([#xmlel{name = <<"pair">>,
 parse_suppression([#xmlel{name = <<"count">>, children = [{xmlcdata, Count}]},
 		   #xmlel{name = <<"name">>, children = [{xmlcdata, Name}]}]) ->
     io:format("         ~s (~s)~n", [Name, Count]).
+
+
+parse_errors([]) ->
+    ok;
+%% [++++] exiting/2: got ERRORS: [{xmlel,<<"pair">>,[],
+%%                                            [{xmlcdata,<<"\n    ">>},
+%%                                             {xmlel,<<"count">>,[],
+%%                                              [{xmlcdata,<<"1755">>}]},
+%%                                             {xmlcdata,<<"\n    ">>},
+%%                                             {xmlel,<<"unique">>,[],
+%%                                              [{xmlcdata,<<"0x2">>}]},
+%%                                             {xmlcdata,<<"\n  ">>}]},
+%%                                           {xmlel,<<"pair">>,[],
+%%                                            [{xmlcdata,<<"\n    ">>},
+%%                                             {xmlel,<<"count">>,[],
+%%                                              [{xmlcdata,<<"1755">>}]},
+%%                                             {xmlcdata,<<"\n    ">>},
+%%                                             {xmlel,<<"unique">>,[],
+%%                                              [{xmlcdata,<<"0x1">>}]},
+%%                                             {xmlcdata,<<"\n  ">>}]},
+%%                                           {xmlel,<<"pair">>,[],
+%%                                            [{xmlcdata,<<"\n    ">>},
+%%                                             {xmlel,<<"count">>,[],
+%%                                              [{xmlcdata,<<"16">>}]},
+%%                                             {xmlcdata,<<"\n    ">>},
+%%                                             {xmlel,<<"unique">>,[],
+%%                                              [{xmlcdata,<<"0xce6">>}]},
+%%                                             {xmlcdata,<<"\n  ">>}]},
+%%                                           {xmlel,<<"pair">>,[],
+%%                                            [{xmlcdata,<<"\n    ">>},
+%%                                             {xmlel,<<"count">>,[],
+%%                                              [{xmlcdata,<<"2">>}]},
+%%                                             {xmlcdata,<<"\n    ">>},
+%%                                             {xmlel,<<"unique">>,[],
+%%                                              [{xmlcdata,<<"0xce5">>}]},
+%%                                             {xmlcdata,<<"\n  ">>}]}]
+parse_errors([#xmlel{name = <<"pair">>,
+		     children = C0} | Tail]) ->
+    C1 = remove_whitespaces(C0),
+    parse_error(C1),
+    %% cio:dbg("C1: ~p~n", [C1]),
+    parse_errors(Tail).
+
+
+parse_error([#xmlel{name = <<"count">>, children = [{xmlcdata, Count}]},
+	     #xmlel{name = <<"unique">>, children = [{xmlcdata, Unique}]}]) ->
+    io:format("         ~s (~s)~n", [Unique, Count]).
