@@ -73,6 +73,7 @@ init([Parent, Command]) ->
 
     %% Populate atoms table
     %% Listed in the order they appear in memcheck/mc_errors.c
+    %% Do not comment or remove those lines !
     cio:dbg("Atom: ~p~n", ['CoreMemError']),
     cio:dbg("Atom: ~p~n", ['UninitValue']),
     cio:dbg("Atom: ~p~n", ['UninitCondition']),
@@ -220,7 +221,7 @@ running(_Event, State) ->
 
 exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_ERROR, children = C0}}, #state{errors = Errors, error_cb = CB} = State) ->
     C1 = remove_whitespaces(C0),
-    cio:dbg("exiting/2: CB= ~p error(~n~p~n)~n", [CB, C1]),
+    %% cio:dbg("exiting/2: CB= ~p error(~n~p~n)~n", [CB, C1]),
     #mc_error{kind = _Kind} = Error = ?MODULE:CB(C1),
     %% cio:ok("Error: ~p~n", [Error]),
     cio:warn("#memcheck Leak ERROR (~w)~n", [_Kind]),
