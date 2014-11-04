@@ -1,7 +1,5 @@
 %% Records
 -record(mc_frame, {ip, obj, fn, dir, file, line}).
--record(mc_leak,  {text, leakedbytes, leakedblocks}).
-
 
 %% Memcheck: errors
 -define(MC_ERR_UNV, 'UninitValue').

@@ -284,4 +284,9 @@ mc_leak([
     Text = list_to_binary(Text0),
     LeakedBytes = list_to_integer(LeakedBytes0),
     LeakedBlocks = list_to_integer(LeakedBlocks0),
-    #mc_leak{text = Text, leakedbytes = LeakedBytes, leakedblocks = LeakedBlocks}.
+    %% A leak
+    #{
+       text => Text,
+       leakedbytes => LeakedBytes,
+       leakedblocks => LeakedBlocks
+     }.
