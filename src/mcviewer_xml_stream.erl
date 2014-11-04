@@ -194,9 +194,9 @@ running({xmlstreamelement, #xmlel{name = ?VALGRIND_ERROR, children = C0}}, #stat
     %%   [{xmlcdata,<<"UninitValue">>}]},
     C1 = remove_whitespaces(C0),
     %% cio:dbg("running/2: error(~n~p~n)~n", [C1]),
-    Error = ?MODULE:CB(C1),
+    Error = #{ kind := Kind } = ?MODULE:CB(C1),
     %% cio:dbg("Error: ~p~n", [Error]),
-    cio:warn("#memcheck Access ERROR (~w)~n", [Error#mc_error.kind]),
+    cio:warn("#memcheck Access ERROR (~w)~n", [Kind]),
     mcviewer_graph:error(Error),
     {next_state, running, State#state{errors = [Error | Errors]}};
 running({xmlstreamelement, #xmlel{name = ?VALGRIND_STATUS,
@@ -222,7 +222,7 @@ running(_Event, State) ->
 exiting({xmlstreamelement, #xmlel{name = ?VALGRIND_ERROR, children = C0}}, #state{errors = Errors, error_cb = CB} = State) ->
     C1 = remove_whitespaces(C0),
     %% cio:dbg("exiting/2: CB= ~p error(~n~p~n)~n", [CB, C1]),
-    #mc_error{kind = _Kind} = Error = ?MODULE:CB(C1),
+    Error = #{ kind := _Kind } = ?MODULE:CB(C1),
     %% cio:ok("Error: ~p~n", [Error]),
     cio:warn("#memcheck Leak ERROR (~w)~n", [_Kind]),
     mcviewer_graph:error(Error),
@@ -439,11 +439,13 @@ mc_error([#xmlel{name = <<"unique">>,
 	  #xmlel{name = <<"stack">>,
 		 children = Stack0}]) ->
     Stack = stack(remove_whitespaces(Stack0)),
-    #mc_error{unique = UniqueBin,
-	      tid = binary_to_integer(TidBin),
-	      kind = binary_to_existing_atom(KindBin),
-	      what = WhatBin,
-	      stack = Stack};
+    #{
+       unique => UniqueBin,
+       tid => binary_to_integer(TidBin),
+       kind => binary_to_existing_atom(KindBin),
+       what => WhatBin,
+       stack => Stack
+     };
 mc_error([#xmlel{name = <<"unique">>,
 		 children = [{xmlcdata, UniqueBin}]}, %% <<"0x2">>
 	  #xmlel{name = <<"tid">>,
@@ -460,13 +462,15 @@ mc_error([#xmlel{name = <<"unique">>,
 		 children = AuxWhatStack0}]) ->
     Stack = stack(remove_whitespaces(Stack0)),
     AuxWhatStack = stack(remove_whitespaces(AuxWhatStack0)),
-    #mc_error{unique = UniqueBin,
-	      tid = binary_to_integer(TidBin),
-	      kind = binary_to_existing_atom(KindBin),
-	      what = WhatBin,
-	      stack = Stack,
-	      auxwhat = AuxWhatBin,
-	      auxstack = AuxWhatStack};
+    #{
+       unique => UniqueBin,
+       tid => binary_to_integer(TidBin),
+       kind => binary_to_existing_atom(KindBin),
+       what => WhatBin,
+       stack => Stack,
+       auxwhat => AuxWhatBin,
+       auxstack => AuxWhatStack
+     };
 mc_error([#xmlel{name = <<"unique">>,
 		 children = [{xmlcdata, UniqueBin}]}, %% <<"0x2">>
 	  #xmlel{name = <<"tid">>,
@@ -479,11 +483,13 @@ mc_error([#xmlel{name = <<"unique">>,
 		 children = Stack0}
 	  | Rest]) ->
     Stack = stack(remove_whitespaces(Stack0)),
-    Error = #mc_error{unique = UniqueBin,
-		      tid = binary_to_integer(TidBin),
-		      kind = binary_to_existing_atom(KindBin),
-		      what = WhatBin,
-		      stack = Stack},
+    Error = #{
+      unique => UniqueBin,
+      tid => binary_to_integer(TidBin),
+      kind => binary_to_existing_atom(KindBin),
+      what => WhatBin,
+      stack => Stack
+     },
     update_error(Error, Rest);
 mc_error([#xmlel{name = <<"unique">>,
 		 children = [{xmlcdata, UniqueBin}]},
@@ -494,17 +500,19 @@ mc_error([#xmlel{name = <<"unique">>,
 	  #xmlel{name = <<"xwhat">>,
 		 children = XWhat0},
 	  #xmlel{name = <<"stack">>,
-		 children = Stack0}
-	  | Rest]) ->
-    Kind = binary_to_atom(KindBin),
+		 children = Stack0}]) ->
+	  %% | Rest]) ->
+    Kind = binary_to_existing_atom(KindBin),
     XWhat = xwhat(remove_whitespaces(XWhat0)),
     Stack = stack(remove_whitespaces(Stack0)),
     mcviewer_leaks:add_leak(Kind, XWhat#leak.bytes, XWhat#leak.blocks),
-    Error = #mc_error{unique = UniqueBin,
-		      tid = binary_to_integer(TidBin),
-		      kind = binary_to_existing_atom(KindBin),
-		      xwhat = XWhat,
-		      auxstack = Stack},
+    Error = #{
+      unique => UniqueBin,
+      tid => binary_to_integer(TidBin),
+      kind => Kind,
+      xwhat => XWhat,
+      auxstack => Stack
+     },
     %% update_error_aux(Error, Rest); %% Or use existing update_error/2 ?
     Error;
 mc_error(Other) ->
@@ -512,12 +520,15 @@ mc_error(Other) ->
     undefined.
 
 
-update_error(#mc_error{auxwhat = undefined} = Error, [#xmlel{name = <<"auxwhat">>,
-							     children = [{xmlcdata, AuxWhatBin0}]},
-						      #xmlel{name = <<"auxwhat">>,
-							     children = [{xmlcdata, AuxWhatBin1}]}]) ->
+update_error(
+  %% ??? possible bug due to maps switching
+  %%#mc_error{auxwhat = undefined} = Error,
+  Error, [#xmlel{name = <<"auxwhat">>,
+		 children = [{xmlcdata, AuxWhatBin0}]},
+	  #xmlel{name = <<"auxwhat">>,
+		 children = [{xmlcdata, AuxWhatBin1}]}]) ->
     AuxWhat = iolist_to_binary([AuxWhatBin0, <<", ">>, AuxWhatBin1]),
-    Error#mc_error{auxwhat = AuxWhat};
+    Error#{ auxwhat => AuxWhat };
 update_error(Error, Rest) ->
     cio:dbg("NEW parser: Rest= ~p~n", [Rest]),
     Error.

@@ -153,7 +153,13 @@ mc_error([#xmlElement{name = unique, content = [#xmlText{value = U0}]},
     Kind = list_to_existing_atom(Kind0),
     Stack = trim_whites(Stack0),
     Frames = [mc_frame(F) || F <- Stack],
-    #mc_error{unique = U, tid = Tid, kind = Kind, what = What, stack = Frames};
+    #{
+       unique => U,
+       tid => Tid,
+       kind => Kind,
+       what => What,
+       stack => Frames
+     };
 mc_error([#xmlElement{name = unique, content = [#xmlText{value = U0}]},
 	  #xmlElement{name = tid, content = [#xmlText{value = Tid0}]},
 	  #xmlElement{name = kind, content = [#xmlText{value = Kind0}]},
@@ -166,7 +172,14 @@ mc_error([#xmlElement{name = unique, content = [#xmlText{value = U0}]},
     Stack = trim_whites(Stack0),
     Frames = [mc_frame(F) || F <- Stack],
     AuxWhat = list_to_binary(AuxWhat0),
-    #mc_error{unique = U, tid = Tid, kind = Kind, what = What, stack = Frames, auxwhat = AuxWhat};
+    #{
+       unique => U,
+       tid => Tid,
+       kind => Kind,
+       what => What,
+       stack => Frames,
+       auxwhat => AuxWhat
+     };
 mc_error([#xmlElement{name = unique, content = [#xmlText{value = U0}]},
 	  #xmlElement{name = tid, content = [#xmlText{value = Tid0}]},
 	  #xmlElement{name = kind, content = [#xmlText{value = Kind0}]},
@@ -185,7 +198,13 @@ mc_error([#xmlElement{name = unique, content = [#xmlText{value = U0}]},
     %% cio:info("Stack: ~p~n", [Stack]),
     Frames = [mc_frame(F) || F <- Stack],
     %% cio:info("Frames: ~p~n", [Frames]),
-    #mc_error{unique = U, tid = Tid, kind = Kind, xwhat = XWhat2, stack = Frames};
+    #{
+       unique => U,
+       tid => Tid,
+       kind => Kind,
+       xwhat => XWhat2,
+       stack => Frames
+     };
 %% TODO here handle memleaks etc
 mc_error(El) ->
     Recs = [element(1, T) || T <- El],

@@ -183,8 +183,7 @@ main(["run" | Args]) ->
 	    halt(1);
 
 	{'DOWN', _Ref, process, ExecPid, {exit_status, 16896 = Status}} ->
-	    cio:ok("Wrapper exited with status: ~p which means that memcheck exited with errors, you get the point.~n", [Status]),
-	    cio:ok("Since we used --error-exitcode=66, this is correct, period.~n", []);
+	    cio:ok("Wrapper exited with status: ~p (errors found by memcheck).~n", [Status]);
 
 	{'DOWN', _Ref, process, ExecPid, {exit_status, Status}} ->
 	    cio:info("Wrapper exited with status: ~p~n", [Status]);
