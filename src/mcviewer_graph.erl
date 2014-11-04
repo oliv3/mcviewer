@@ -168,7 +168,7 @@ errors_cb([#{ unique := Unique,
 	      tid := Tid,
 	      kind := Kind,
 	      what := What,
-	      stack := [#mc_frame{ip = IP} = At | By]
+	      stack := [#{ ip := IP } = At | By]
 	    } | Errors], LastErrorV) ->
     cio:dbg("~p (~s) in thread ~w~n", [Kind, Unique, Tid]),
     %% cio:warn("At ~p~n", [At]),
@@ -215,9 +215,9 @@ errors_cb([#{ unique := Unique,
 
     errors_cb(Errors, ErrorV);
 errors_cb([#{ unique := Unique,
-	      tid := Tid,
-	      kind := Kind,
-	      what := What %% ,
+	      tid := _Tid,
+	      kind := _Kind,
+	      what := _What %% ,
 	      %% stack := Stack,
 	      %% auxstack := AuxStack
 	    } | Errors], LastErrorV) ->
@@ -264,7 +264,7 @@ shape(Other) ->
 
 graph_by(_LastV, []) ->
     ok;
-graph_by(LastV, [#mc_frame{ip = IP} = Frame | Frames]) ->
+graph_by(LastV, [#{ ip := IP } = Frame | Frames]) ->
     %% {Color, _Label} = label(Frame),
     V = frame_vertex(IP),
 
@@ -281,18 +281,38 @@ graph_by(LastV, [#mc_frame{ip = IP} = Frame | Frames]) ->
     graph_by(V, Frames).
 
 
-frame_color(#mc_frame{fn = undefined, dir = undefined, file = undefined, line = undefined}) ->
-    red;
-frame_color(#mc_frame{dir = undefined, file = undefined, line = undefined}) ->
-    orange;
-frame_color(#mc_frame{}) ->
-    white.
+%% frame_color(#{
+%% 	       fn := undefined,
+%% 	       dir = undefined,
+%% 	       file = undefined,
+%% 	       line = undefined
+%% 	     }) ->
+%%     red;
+frame_color(#{
+	       ip := _IP,
+	       file := _File,
+	       line := _Line
+	     }) ->
+    white;
+frame_color(#{ ip := _IP }) ->
+    orange.
 
 
-label(#mc_frame{ip = Ip, obj = _Obj, fn = undefined, dir = undefined, file = undefined, line = undefined}) ->
-    %% lists:flatten(io_lib:format("~s (~s)", [Ip, Obj]));
-    lists:flatten(io_lib:format("~s", [Ip]));
-label(#mc_frame{ip = Ip, obj = _Obj, fn = Fn, dir = undefined, file = undefined, line = undefined}) ->
-    lists:flatten(io_lib:format("~s (~s)", [Ip, Fn]));
-label(#mc_frame{ip = Ip, obj = _Obj, fn = Fn, dir = _Dir, file = _File, line = _Line}) ->
+%% label(#mc_frame{ip = Ip, obj = _Obj, fn = undefined, dir = undefined, file = undefined, line = undefined}) ->
+%%     %% lists:flatten(io_lib:format("~s (~s)", [Ip, Obj]));
+%%     lists:flatten(io_lib:format("~s", [Ip]));
+%% label(#mc_frame{ip = Ip, obj = _Obj, fn = Fn, dir = undefined, file = undefined, line = undefined}) ->
+%%     lists:flatten(io_lib:format("~s (~s)", [Ip, Fn]));
+%% label(#mc_frame{ip = Ip, obj = _Obj, fn = Fn, dir = _Dir, file = _File, line = _Line}) ->
+%%     lists:flatten(io_lib:format("~s (~s)", [Ip, Fn])).
+
+%% label(#mc_frame{ip = Ip, obj = _Obj, fn = undefined, dir = undefined, file = undefined, line = undefined}) ->
+%%     %% lists:flatten(io_lib:format("~s (~s)", [Ip, Obj]));
+%%     lists:flatten(io_lib:format("~s", [Ip]));
+%% label(#mc_frame{ip = Ip, obj = _Obj, fn = Fn, dir = undefined, file = undefined, line = undefined}) ->
+%%     lists:flatten(io_lib:format("~s (~s)", [Ip, Fn]));
+label(#{
+	 ip := Ip,
+	 fn := Fn
+       }) ->
     lists:flatten(io_lib:format("~s (~s)", [Ip, Fn])).

@@ -233,14 +233,14 @@ mc_frame([
     %% cio:info("Dir0: ~p~n", [Dir0]),
     %% cio:info("File0: ~p~n", [File0]),
     %% cio:info("Line0: ~p~n", [Line0]),
-    #mc_frame{
-       ip = IP0,
-       obj = Obj0,
-       fn = Fn0,
-       dir = Dir0,
-       file = File0,
-       line = list_to_integer(Line0)
-      };
+    #{
+       ip =>IP0,
+       obj => Obj0,
+       fn => Fn0,
+       dir => Dir0,
+       file => File0,
+       line => list_to_integer(Line0)
+     };
 mc_frame([
 	  #xmlElement{name = ip, content = [#xmlText{value = IP0}]},
 	  #xmlElement{name = obj, content = [#xmlText{value = Obj0}]},
@@ -249,28 +249,28 @@ mc_frame([
     %% cio:info("IP0: ~p~n", [IP0]),
     %% cio:info("Obj0: ~p~n", [Obj0]),
     %% cio:info("Fn0: ~p~n", [Fn0]),
-    #mc_frame{
-       ip = IP0,
-       obj = Obj0,
-       fn = Fn0
-      };
+    #{
+       ip => IP0,
+       obj => Obj0,
+       fn => Fn0
+     };
 mc_frame([
 	  #xmlElement{name = ip, content = [#xmlText{value = IP0}]},
 	  #xmlElement{name = obj, content = [#xmlText{value = Obj0}]}
 	 ]) ->
     %% cio:info("IP0: ~p~n", [IP0]),
     %% cio:info("Obj0: ~p~n", [Obj0]),
-    #mc_frame{
-       ip = IP0,
-       obj = Obj0
-      };
+    #{
+       ip => IP0,
+       obj => Obj0
+     };
 mc_frame([
 	  #xmlElement{name = ip, content = [#xmlText{value = IP0}]}
 	 ]) ->
     %% cio:info("IP0: ~p~n", [IP0]),
-    #mc_frame{
-       ip = IP0
-      };
+    #{
+       ip => IP0
+     };
 mc_frame(X) ->
     cio:fail("mc_frame(~p)~n", [X]),
     undefined.

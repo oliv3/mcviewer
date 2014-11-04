@@ -1,6 +1,3 @@
-%% Records
--record(mc_frame, {ip, obj, fn, dir, file, line}).
-
 %% Memcheck: errors
 -define(MC_ERR_UNV, 'UninitValue').
 -define(MC_ERR_UNC, 'UninitCondition').

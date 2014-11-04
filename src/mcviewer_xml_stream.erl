@@ -544,6 +544,7 @@ stack([#xmlel{name = <<"frame">>,
     Frame = frame(remove_whitespaces(C0)),
     stack(Tail, [Frame | Acc]).
 
+
 frame([#xmlel{name = <<"ip">>,
 	      children = [{xmlcdata, IPBin}]}, %% <<"0x40FA68">>
        #xmlel{name = <<"obj">>,
@@ -557,12 +558,14 @@ frame([#xmlel{name = <<"ip">>,
        #xmlel{name = <<"line">>,
 	      children = [{xmlcdata, LineBin}]} %% <<"150">>
       ]) ->
-    #mc_frame{ip = IPBin,
-	      obj = ObjBin,
-	      fn = binary_to_atom(FnBin),
-	      dir = DirBin,
-	      file = FileBin,
-	      line = binary_to_integer(LineBin)};
+    #{
+       ip => IPBin,
+       obj => ObjBin,
+       fn => binary_to_atom(FnBin),
+       dir => DirBin,
+       file => FileBin,
+       line => binary_to_integer(LineBin)
+     };
 frame([#xmlel{name = <<"ip">>,
 	      children = [{xmlcdata, IPBin}]},
        #xmlel{name = <<"obj">>,
@@ -570,19 +573,23 @@ frame([#xmlel{name = <<"ip">>,
        #xmlel{name = <<"fn">>,
 	      children = [{xmlcdata, FnBin}]}
       ]) ->
-    #mc_frame{ip = IPBin,
-	      obj = ObjBin,
-	      fn = binary_to_atom(FnBin)};
+    #{
+       ip => IPBin,
+       obj => ObjBin,
+       fn => binary_to_atom(FnBin)
+     };
 frame([#xmlel{name = <<"ip">>,
 	      children = [{xmlcdata, IPBin}]},
        #xmlel{name = <<"obj">>,
 	      children = [{xmlcdata, ObjBin}]}
       ]) ->
-    #mc_frame{ip = IPBin,
-	      obj = ObjBin};
+    #{
+       ip => IPBin,
+       obj => ObjBin
+     };
 frame([#xmlel{name = <<"ip">>,
 	      children = [{xmlcdata, IPBin}]}]) ->
-    #mc_frame{ip = IPBin};
+    #{ ip => IPBin };
 frame(_Other) ->
     cio:fail("TODO: frame(~p)~n", [_Other]),
     halt(1),
@@ -600,7 +607,11 @@ xwhat([#xmlel{name = <<"text">>,
     LeakedBlocks = binary_to_integer(LeakedBlocksBin),
     cio:dbg("INSULT: ~s~n", [TextBin]),
     %% cio:fail("~w mother fucking *BYTES* lost in ~w fucking *BLOCKS*, man !!!~n", [LeakedBytes, LeakedBlocks]),
-    #leak{bytes = LeakedBytes, blocks = LeakedBlocks}.
+    #{
+       text => TextBin,
+       leakedbytes => LeakedBytes,
+       leakedblocks => LeakedBlocks
+     }.
 
 
 dump_state(#state{tool = Tool, pid = Pid, ppid = PPid, errors = Errors}) ->
