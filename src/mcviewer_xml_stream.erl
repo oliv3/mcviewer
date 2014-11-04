@@ -24,7 +24,7 @@
 -define(SERVER, ?MODULE).
 
 -record(state, {parent, tool, pid, ppid, errors = [], error_cb, user_comment, command}).
--record(leak, {bytes = 0, blocks = 0}). %% Let us be optimilistic :)
+-record(leak, {bytes = 0, blocks = 0}). %% Let' be optimistic :)
 
 %%%===================================================================
 %%% API
